@@ -149,8 +149,9 @@ app.post('/api/ubicacion', authMiddleware, async (req, res) => {
  */
 app.get('/api/ubicaciones/:codigo', authMiddleware, async (req, res) => {
   const { codigo } = req.params
-  const limite = Math.min(parseInt(req.query.limite) || 100, 1000)
+  const limite = Math.min(parseInt(req.query.limite) || 10000, 10000) // aumentamos limite para recorridos largos
   const desde  = req.query.desde || null
+  const hasta  = req.query.hasta || null
 
   try {
     const bodycamResult = await pool.query(
@@ -174,6 +175,11 @@ app.get('/api/ubicaciones/:codigo', authMiddleware, async (req, res) => {
     if (desde) {
       params.push(desde)
       query += ` AND registrado_en >= $${params.length}`
+    }
+    
+    if (hasta) {
+      params.push(hasta)
+      query += ` AND registrado_en <= $${params.length}`
     }
 
     query += ` ORDER BY registrado_en DESC LIMIT $${params.length + 1}`
