@@ -231,10 +231,29 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() })
 })
 
+// ─── Limpieza Automática de Datos ─────────────────────────────────────────────
+const limpiarDatosAntiguos = async () => {
+  try {
+    const result = await pool.query(`
+      DELETE FROM ubicaciones 
+      WHERE registrado_en < NOW() - INTERVAL '2 days'
+    `)
+    if (result.rowCount > 0) {
+      console.log(`🧹 Limpieza automática: Se eliminaron ${result.rowCount} ubicaciones antiguas (más de 2 días).`)
+    }
+  } catch (err) {
+    console.error('Error al limpiar ubicaciones antiguas:', err)
+  }
+}
+
+// Ejecutar la limpieza cada 6 horas (21600000 ms)
+setInterval(limpiarDatosAntiguos, 6 * 60 * 60 * 1000)
+
 // ─── Arranque ─────────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 3000
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Servidor bodycam-tracker corriendo en puerto ${PORT}`)
+  limpiarDatosAntiguos() // Ejecutar una limpieza inicial al arrancar
 })
 
 module.exports = app
