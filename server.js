@@ -16,31 +16,15 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD || 'tu_password',
 })
 
-const jwt = require('jsonwebtoken')
-
 // ─── Middleware de autenticación por token ────────────────────────────────────
 function authMiddleware(req, res, next) {
   const authHeader = req.headers['authorization']
   const token = authHeader && authHeader.split(' ')[1] // "Bearer <token>"
 
-  if (!token) {
-    return res.status(401).json({ error: 'Token ausente' })
+  if (!token || token !== process.env.API_TOKEN) {
+    return res.status(401).json({ error: 'Token no válido' })
   }
-
-  // 1. Verificar si es el token estático de las Bodycams Físicas (Hardware)
-  if (process.env.API_TOKEN && token === process.env.API_TOKEN) {
-    return next()
-  }
-
-  // 2. Si no es el estático, verificar si es un Token JWT (Usuarios web)
-  const secret = process.env.JWT_SECRET || 'M7f7b2a9H42G4d29bQbar8d81a794mM6c786204mu2e4d8n68f0642f3b6c77pp3';
-  jwt.verify(token, secret, (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ error: 'Token inválido o expirado' })
-    }
-    req.user = decoded;
-    next()
-  })
+  next()
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
