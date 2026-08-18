@@ -33,7 +33,7 @@ function authMiddleware(req, res, next) {
   }
 
   // 2. Si no es el estático, verificar si es un Token JWT (Usuarios web)
-  const secret = process.env.JWT_SECRET || 'M7f7b2a9H42g4d29bQbar8d81a794mM6c786204mu2e4d8n68f0642f3b6c77pp3';
+  const secret = process.env.JWT_SECRET || 'M7f7b2a9H42G4d29bQbar8d81a794mM6c786204mu2e4d8n68f0642f3b6c77pp3';
   jwt.verify(token, secret, (err, decoded) => {
     if (err) {
       return res.status(401).json({ error: 'Token inválido o expirado' })
