@@ -226,6 +226,9 @@ app.get('/api/ubicaciones/:codigo/ultima', authMiddleware, async (req, res) => {
   }
 })
 
+// ─── Reconocimiento facial (proxy al backend de biometría) ────────────────────
+app.use(require('./reconocimiento').crearRouter(authMiddleware))
+
 // ─── Health check ─────────────────────────────────────────────────────────────
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() })
